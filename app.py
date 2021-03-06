@@ -40,7 +40,7 @@ def home():
 
     )
 
-
+#show percip data in all stations in descending order
 @app.route("/api/v1.0/precipitation") 
 def precipitation():
     session = Session(engine)
@@ -49,7 +49,7 @@ def precipitation():
     results = (session.query(Measurement.date, Measurement.tobs)
                       .order_by(Measurement.date))
     
-    # Create a dictionary
+    # Create a list to store tobs data
     precip_date_tobs = []
     for row in results:
         dt_dict = {}
@@ -59,6 +59,8 @@ def precipitation():
 
     return jsonify(precip_date_tobs)
 
+
+#return data for all the stations in the data base
 @app.route("/api/v1.0/stations") 
 def stations():
 
@@ -70,6 +72,8 @@ def stations():
 
     return jsonify(station_list)
 
+
+#show all temperature observed data ordered by active station
 @app.route("/api/v1.0/tobs") 
 def tobs():
 
@@ -95,7 +99,7 @@ def tobs():
     print(station_list)
 
 
-    # get info for dates 1 year before the final date
+    # get info for dates and order by date
     results = (session.query(Measurement.station, Measurement.date, Measurement.tobs)
                       .filter(Measurement.date >= start_date)
                       .filter(Measurement.station == station_list)
@@ -112,7 +116,7 @@ def tobs():
 
     return jsonify(tobs_list)
 
-
+#create a route for users to input a start date for temperature data
 @app.route("/api/v1.0/<start>") 
 def start_route(start):
 
@@ -150,13 +154,13 @@ def start_route(start):
     						'The highest Temperature was: ' + str(temp_max) + ' F'])
     	return jsonify(result_q)
 
-    return jsonify({"error": f"Input Date {start} not valid. Date Range is {date_min_str} to {date_max_str}"}), 404
+    return jsonify({"error": f"Input Date {start} not valid. Date Range is between {date_min_str} and {date_max_str}"}), 404
 
 
 
 
 
-
+#create a route for users to input start and end date for temperature data
 @app.route("/api/v1.0/<start>/<end>") 
 def start_end(start, end):
 
@@ -200,13 +204,13 @@ def start_end(start, end):
     	return jsonify(result_q)
 
     if not range_check_start and not range_check_end:
-    	return jsonify({"error": f"Input Start {start} and End Date {end} not valid. Date Range is {date_min_str} to {date_max_str}"}), 404
+    	return jsonify({"error": f"Input Start {start} and End Date {end} not within Date Range. Date Range is between {date_min_str} and {date_max_str}"}), 404
 
     if not range_check_start:
-    	return jsonify({"error": f"Input Start Date {start} not valid. Date Range is {date_min_str} to {date_max_str}"}), 404
+    	return jsonify({"error": f"Input Start Date {start} not valid. Date Range is between {date_min_str} and {date_max_str}"}), 404
 
     if not range_check_end:
-    	return jsonify({"error": f"Input End Date {end} not valid. Date Range is {date_min_str} to {date_max_str}"}), 404
+    	return jsonify({"error": f"Input End Date {end} not valid. Date Range is between {date_min_str} and {date_max_str}"}), 404
 
 
 
